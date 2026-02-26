@@ -29,7 +29,6 @@ class APIClient:
         self.timeout = timeout
         self.requests_per_second = requests_per_second
         self._last_call = 0
-
         self.session = requests.Session()
 
         headers = {"User-Agent": "Axiom-API-Framework/1.0"}
@@ -37,7 +36,6 @@ class APIClient:
             headers["Authorization"] = f"Bearer {api_key}"
         self.session.headers.update(headers)
 
-        # allowed_methods replaces method_whitelist in urllib3 2.0+
         retry_strategy = Retry(
             total=max_retries,
             backoff_factor=backoff_factor,
@@ -50,7 +48,7 @@ class APIClient:
         self.session.mount("https://", adapter)
 
     def _rate_limit(self):
-        """Token-bucket style rate limiting."""
+        """Simple interval throttle: enforces minimum gap between requests."""
         now = time.time()
         elapsed = now - self._last_call
         min_interval = 1.0 / self.requests_per_second
@@ -64,7 +62,7 @@ class APIClient:
         kwargs.setdefault("timeout", self.timeout)
         return self.session.request(method.upper(), url, **kwargs)
 
-    def get(self, endpoint: str, params: Optional[Dict] = None) -> Dict[Any, Any]:
+    def get(self, endpoint: str, params: Optional[Dict] = None) -> Any:
         r = self._request("GET", endpoint, params=params)
         r.raise_for_status()
         return r.json()
@@ -75,7 +73,7 @@ class APIClient:
         data: Optional[Dict] = None,
         json: Optional[Dict] = None,
         params: Optional[Dict] = None,
-    ) -> Dict[Any, Any]:
+    ) -> Any:
         r = self._request("POST", endpoint, data=data, json=json, params=params)
         r.raise_for_status()
         return r.json()
@@ -86,7 +84,7 @@ class APIClient:
         data: Optional[Dict] = None,
         json: Optional[Dict] = None,
         params: Optional[Dict] = None,
-    ) -> Dict[Any, Any]:
+    ) -> Any:
         r = self._request("PUT", endpoint, data=data, json=json, params=params)
         r.raise_for_status()
         return r.json()
