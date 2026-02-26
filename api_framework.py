@@ -69,13 +69,25 @@ class APIClient:
         r.raise_for_status()
         return r.json()
 
-    def post(self, endpoint: str, data: Optional[Dict] = None, json: Optional[Dict] = None) -> Dict[Any, Any]:
-        r = self._request("POST", endpoint, data=data, json=json)
+    def post(
+        self,
+        endpoint: str,
+        data: Optional[Dict] = None,
+        json: Optional[Dict] = None,
+        params: Optional[Dict] = None,
+    ) -> Dict[Any, Any]:
+        r = self._request("POST", endpoint, data=data, json=json, params=params)
         r.raise_for_status()
         return r.json()
 
-    def put(self, endpoint: str, data: Optional[Dict] = None, json: Optional[Dict] = None) -> Dict[Any, Any]:
-        r = self._request("PUT", endpoint, data=data, json=json)
+    def put(
+        self,
+        endpoint: str,
+        data: Optional[Dict] = None,
+        json: Optional[Dict] = None,
+        params: Optional[Dict] = None,
+    ) -> Dict[Any, Any]:
+        r = self._request("PUT", endpoint, data=data, json=json, params=params)
         r.raise_for_status()
         return r.json()
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-gemini-client.py — Gemini API client built on APIClient
+gemini_client.py — Gemini API client built on APIClient
 Demonstrates: framework extension, LLM API integration, production error handling
 
 Requires:
@@ -27,9 +27,9 @@ class GeminiClient(APIClient):
     """Production Gemini API client with retry, rate limiting, and structured output."""
 
     def __init__(self, api_key: str = None, requests_per_second: int = 5):
+        self._gemini_key = api_key or os.environ["GEMINI_API_KEY"]
         super().__init__(
             base_url=GEMINI_BASE,
-            api_key=api_key or os.environ["GEMINI_API_KEY"],
             requests_per_second=requests_per_second,
             max_retries=5,
             backoff_factor=1.0,
@@ -45,7 +45,7 @@ class GeminiClient(APIClient):
             body["systemInstruction"] = {"parts": [{"text": system}]}
 
         endpoint = f"/v1beta/models/{self.model}:generateContent"
-        params = {"key": self._api_key()}
+        params = {"key": self._gemini_key}
 
         response = self.post(endpoint, json=body, params=params)
         return response["candidates"][0]["content"]["parts"][0]["text"]
@@ -56,9 +56,6 @@ class GeminiClient(APIClient):
         raw = self.generate(json_prompt, system=system)
         clean = raw.strip().removeprefix("```json").removesuffix("```").strip()
         return json.loads(clean)
-
-    def _api_key(self) -> str:
-        return self.session.headers.get("Authorization", "").replace("Bearer ", "")
 
 
 # ── Demo ──────────────────────────────────────────────────────────────────────
