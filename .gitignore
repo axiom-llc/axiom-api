@@ -21,7 +21,6 @@ env/
 # Google Cloud
 .gcloud/
 gcloud-service-key.json
-*.json
 
 # Logs
 *.log

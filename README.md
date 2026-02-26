@@ -31,11 +31,11 @@ See `example_usage.py` for a runnable demo against a public test API.
 ## Examples
 
 - `example_usage.py` — basic GET/POST against JSONPlaceholder (no key required)
-- `gemini-client.py` — production Gemini API client with structured JSON output
+- `gemini_client.py` — production Gemini API client with structured JSON output
 
 ```bash
 export GEMINI_API_KEY=your-key
-python gemini-client.py "explain the CAP theorem in 3 bullet points"
+python gemini_client.py "explain the CAP theorem in 3 bullet points"
 ```
 
 A working client for any new API takes under 30 minutes from scratch.
