@@ -4,6 +4,8 @@ Drop `api_framework.py` into any Python project to get production-grade HTTP
 behaviour — automatic retry, exponential backoff, and rate limiting — without
 rewriting the same error-handling logic for every new integration.
 
+![CI](https://github.com/axiom-llc/api-integration-framework/actions/workflows/ci.yml/badge.svg)
+
 Built for automation pipelines where reliability is non-negotiable: transient
 failures retry silently, rate limits are respected, sessions are always cleaned
 up, and errors surface as typed exceptions rather than silent data corruption.
@@ -91,6 +93,16 @@ python gemini_client.py "explain the CAP theorem in 3 bullet points"
 ```
 
 A working client for any new API takes under 30 minutes from scratch.
+
+---
+
+## Tests
+
+```bash
+pytest tests/ -q
+```
+
+All tests mock outbound HTTP. No network access or API keys required. CI runs on Python 3.11 and 3.12 on every push.
 
 ---
 
