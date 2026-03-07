@@ -1,23 +1,13 @@
 #!/usr/bin/env python3
 """
-gemini_client.py — Gemini API client built on APIClient
-Demonstrates: framework extension, LLM API integration, production error handling
-
-Requires:
-    pip install requests
-    export GEMINI_API_KEY=your-key
+gemini_client/client.py — Gemini API client built on APIClient
 """
 
 import os
 import sys
 import json
 
-# Assumes run from apex root or api-integration-framework is on PYTHONPATH
-try:
-    from api_framework import APIClient
-except ImportError:
-    print("api_framework not found — see github.com/axiom-llc/api-integration-framework")
-    sys.exit(1)
+from api_framework import APIClient
 
 GEMINI_BASE = "https://generativelanguage.googleapis.com"
 GEMINI_MODEL = "gemini-2.5-flash"
@@ -58,7 +48,6 @@ class GeminiClient(APIClient):
         return json.loads(clean)
 
 
-# ── Demo ──────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     prompt = sys.argv[1] if len(sys.argv) > 1 else "Summarise the key principles of clean system design in 3 bullet points."
 
@@ -66,11 +55,9 @@ if __name__ == "__main__":
         print(f"Model : {client.model}")
         print(f"Prompt: {prompt}\n")
 
-        # Text generation
         response = client.generate(prompt)
         print("Response:\n", response)
 
-        # JSON generation
         json_prompt = "List 3 use cases for AI automation in enterprise workflows. Return as JSON array of objects with 'use_case' and 'impact' fields."
         structured = client.generate_json(json_prompt)
         print("\nStructured output:")
