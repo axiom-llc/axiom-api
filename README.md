@@ -1,8 +1,8 @@
 # api-integration-framework
 
-Drop `api_framework.py` into any Python project to get production-grade HTTP
-behaviour — automatic retry, exponential backoff, and rate limiting — without
-rewriting the same error-handling logic for every new integration.
+Production-grade HTTP client base for REST API integrations — automatic retry,
+exponential backoff, and rate limiting without rewriting the same error-handling
+logic for every new integration.
 
 ![CI](https://github.com/axiom-llc/api-integration-framework/actions/workflows/ci.yml/badge.svg)
 
@@ -20,8 +20,8 @@ up, and errors surface as typed exceptions rather than silent data corruption.
   throttle; safe for burst workloads
 - **Context manager** — guaranteed session cleanup; no leaked connections under
   error conditions
-- **Extensible** — subclass `APIClient` and override `_auth_headers()` to add
-  Bearer tokens, OAuth, HMAC signatures, or any custom scheme
+- **Extensible** — subclass `APIClient` to add Bearer tokens, OAuth, HMAC
+  signatures, or any custom auth scheme
 - **Minimal** — one runtime dependency (`requests`); no frameworks, no magic
 
 ---
@@ -29,10 +29,10 @@ up, and errors surface as typed exceptions rather than silent data corruption.
 ## Installation
 
 ```bash
-pip install requests
+git clone https://github.com/axiom-llc/api-integration-framework
+cd api-integration-framework
+pip install -e .
 ```
-
-Copy `api_framework.py` into your project. No package installation required.
 
 ---
 
@@ -50,59 +50,43 @@ with APIClient(
     result = client.post("/endpoint", json={"field": "value"})
 ```
 
-See `example_usage.py` for a runnable demo against JSONPlaceholder — no API
-key required.
-
 ---
 
 ## Auth Patterns
 
-The base client sends `api_key` as a query parameter. Override
-`_auth_headers()` to use any other scheme:
+The base client sends `api_key` as a Bearer token header. Override in a
+subclass to use any other scheme:
 
 ```python
-class BearerClient(APIClient):
-    def _auth_headers(self) -> dict:
-        return {"Authorization": f"Bearer {self.api_key}"}
-
 class HMACClient(APIClient):
     def _auth_headers(self) -> dict:
         signature = hmac.new(self.api_key.encode(), digestmod="sha256").hexdigest()
         return {"X-Signature": signature}
 ```
 
-Override `_default_headers()` to inject static headers (User-Agent, Content-Type, etc.)
-on every request.
-
 ---
 
 ## Included Examples
 
-**`example_usage.py`** — basic GET / POST against JSONPlaceholder. No key required.
-
-```bash
-python example_usage.py
-```
-
-**`gemini_client.py`** — production Gemini API client with structured JSON output.
-Requires `pip install google-genai` in addition to `requests`.
+**`gemini_client/`** — production Gemini API client with structured JSON output,
+built on `APIClient`.
 
 ```bash
 export GEMINI_API_KEY=your-key
-python gemini_client.py "explain the CAP theorem in 3 bullet points"
+python -m gemini_client.client "explain the CAP theorem in 3 bullet points"
 ```
-
-A working client for any new API takes under 30 minutes from scratch.
 
 ---
 
 ## Tests
 
 ```bash
+pip install -e ".[dev]"
 pytest tests/ -q
 ```
 
-All tests mock outbound HTTP. No network access or API keys required. CI runs on Python 3.11 and 3.12 on every push.
+All tests mock outbound HTTP — no network access or API keys required.
+CI runs on Python 3.11 and 3.12 on every push.
 
 ---
 
@@ -121,13 +105,10 @@ All tests mock outbound HTTP. No network access or API keys required. CI runs on
 
 ## Extending
 
-Subclass `APIClient` for any new integration:
-
 ```python
-class StripeClient(APIClient):
-    def _auth_headers(self) -> dict:
-        return {"Authorization": f"Bearer {self.api_key}"}
+from api_framework import APIClient
 
+class StripeClient(APIClient):
     def list_customers(self, limit: int = 10) -> dict:
         return self.get("/v1/customers", params={"limit": limit})
 
@@ -138,9 +119,6 @@ class StripeClient(APIClient):
             "source": source,
         })
 ```
-
-Add pagination, logging, or response validation in the subclass without
-touching the retry or session logic.
 
 ---
 
