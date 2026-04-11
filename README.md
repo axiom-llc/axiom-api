@@ -124,4 +124,4 @@ class StripeClient(APIClient):
 
 ## License
 
-MIT — [Axiom LLC](https://axiom-llc.github.io)
+MIT — [AXIOM LLC](https://axiom-llc.github.io)
