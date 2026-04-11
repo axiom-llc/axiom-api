@@ -1,0 +1,21 @@
+./.venv/pyvenv.cfg:command = /home/u/.pyenv/versions/3.12.9/bin/python -m venv /home/u/code/apps/api-integration-framework/.venv
+./.venv/bin/activate:    export VIRTUAL_ENV=$(cygpath /home/u/code/apps/api-integration-framework/.venv)
+./.venv/bin/activate:    export VIRTUAL_ENV=/home/u/code/apps/api-integration-framework/.venv
+./.venv/bin/pip3.12:#!/home/u/code/apps/api-integration-framework/.venv/bin/python
+./.venv/bin/pip3:#!/home/u/code/apps/api-integration-framework/.venv/bin/python
+./.venv/bin/pytest:#!/home/u/code/apps/api-integration-framework/.venv/bin/python
+./.venv/bin/py.test:#!/home/u/code/apps/api-integration-framework/.venv/bin/python
+./.venv/bin/activate.csh:setenv VIRTUAL_ENV /home/u/code/apps/api-integration-framework/.venv
+./.venv/bin/pip:#!/home/u/code/apps/api-integration-framework/.venv/bin/python
+./.venv/bin/pygmentize:#!/home/u/code/apps/api-integration-framework/.venv/bin/python
+./.venv/bin/activate.fish:set -gx VIRTUAL_ENV /home/u/code/apps/api-integration-framework/.venv
+./.venv/bin/normalizer:#!/home/u/code/apps/api-integration-framework/.venv/bin/python
+./.venv/lib/python3.12/site-packages/__editable___api_integration_framework_0_1_0_finder.py:MAPPING: dict[str, str] = {'api_framework': '/home/u/code/apps/api-integration-framework/api_framework', 'gemini_client': '/home/u/code/apps/api-integration-framework/gemini_client'}
+./.venv/lib/python3.12/site-packages/api_integration_framework-0.1.0.dist-info/METADATA:Name: api-integration-framework
+./.venv/lib/python3.12/site-packages/api_integration_framework-0.1.0.dist-info/direct_url.json:{"dir_info": {"editable": true}, "url": "file:///home/u/code/apps/api-integration-framework"}
+./pyproject.toml:name = "api-integration-framework"
+./README.md:# api-integration-framework
+./README.md:![CI](https://github.com/axiom-llc/api-integration-framework/actions/workflows/ci.yml/badge.svg)
+./README.md:git clone https://github.com/axiom-llc/api-integration-framework
+./README.md:cd api-integration-framework
+./api_integration_framework.egg-info/PKG-INFO:Name: api-integration-framework

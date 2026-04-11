@@ -1,10 +1,10 @@
-# api-integration-framework
+# axiom-api
 
 Production-grade HTTP client base for REST API integrations — automatic retry,
 exponential backoff, and rate limiting without rewriting the same error-handling
 logic for every new integration.
 
-![CI](https://github.com/axiom-llc/api-integration-framework/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/axiom-llc/axiom-api/actions/workflows/ci.yml/badge.svg)
 
 Built for automation pipelines where reliability is non-negotiable: transient
 failures retry silently, rate limits are respected, sessions are always cleaned
@@ -29,8 +29,8 @@ up, and errors surface as typed exceptions rather than silent data corruption.
 ## Installation
 
 ```bash
-git clone https://github.com/axiom-llc/api-integration-framework
-cd api-integration-framework
+git clone https://github.com/axiom-llc/axiom-api
+cd axiom-api
 pip install -e .
 ```
 
