@@ -1,6 +1,6 @@
 # axiom-api
 
-Production-grade HTTP client base for REST API integrations — automatic retry,
+Production-grade HTTP client base for REST API integrations — automatic retries for idempotent methods,
 exponential backoff, and rate limiting without rewriting the same error-handling
 logic for every new integration.
 
@@ -51,6 +51,23 @@ with APIClient(
 ```
 
 ---
+
+## Retry safety
+
+Status and read-error retries default to idempotent HTTP methods (GET, HEAD,
+OPTIONS, PUT, DELETE, TRACE). POST and PATCH are not retried after a response or
+read failure, since the server may already have applied their side effects.
+Connection failures before sending a request may still retry. Unclassified
+errors are not retried. Set `max_retries=0` to disable all retries.
+
+Only opt in to POST/PATCH retries when the endpoint guarantees idempotency,
+for example with a server-supported idempotency key:
+
+```python
+with APIClient("https://api.example.com", retry_methods=frozenset({"GET", "POST"})) as client:
+    client.session.headers["Idempotency-Key"] = "unique-operation-id"
+    client.post("/orders", json={"quantity": 1})
+```
 
 ## Auth Patterns
 

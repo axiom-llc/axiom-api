@@ -24,7 +24,14 @@ class APIClient:
         timeout: int = 30,
         max_retries: int = 5,
         backoff_factor: float = 0.5,
+        *,
+        retry_methods: frozenset[str] | None = None,
     ):
+        methods = Retry.DEFAULT_ALLOWED_METHODS if retry_methods is None else frozenset(
+            method.upper() for method in retry_methods
+        )
+        if not methods:
+            raise ValueError("retry_methods must be non-empty; use max_retries=0 to disable retries")
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.requests_per_second = requests_per_second
@@ -40,7 +47,8 @@ class APIClient:
             total=max_retries,
             backoff_factor=backoff_factor,
             status_forcelist=[429, 500, 502, 503, 504],
-            allowed_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
+            allowed_methods=methods,
+            other=0,
             raise_on_status=False,
         )
         adapter = HTTPAdapter(max_retries=retry_strategy)
