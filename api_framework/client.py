@@ -68,7 +68,11 @@ class APIClient:
         self._rate_limit()
         url = f"{self.base_url}{endpoint}"
         kwargs.setdefault("timeout", self.timeout)
-        return self.session.request(method.upper(), url, **kwargs)
+        kwargs["allow_redirects"] = False
+        response = self.session.request(method.upper(), url, **kwargs)
+        if 300 <= response.status_code < 400:
+            raise requests.HTTPError("Provider redirect refused", response=response)
+        return response
 
     def get(self, endpoint: str, params: Optional[Dict] = None) -> Any:
         r = self._request("GET", endpoint, params=params)

@@ -24,6 +24,7 @@ class GeminiClient(APIClient):
             max_retries=5,
             backoff_factor=1.0,
         )
+        self.session.headers["x-goog-api-key"] = self._gemini_key
         self.model = GEMINI_MODEL
 
     def generate(self, prompt: str, system: str = None) -> str:
@@ -35,9 +36,7 @@ class GeminiClient(APIClient):
             body["systemInstruction"] = {"parts": [{"text": system}]}
 
         endpoint = f"/v1beta/models/{self.model}:generateContent"
-        params = {"key": self._gemini_key}
-
-        response = self.post(endpoint, json=body, params=params)
+        response = self.post(endpoint, json=body)
         return response["candidates"][0]["content"]["parts"][0]["text"]
 
     def generate_json(self, prompt: str, system: str = None) -> dict:

@@ -85,3 +85,31 @@ def test_explicit_idempotent_post_retry():
 def test_empty_retry_methods_cannot_enable_all_methods():
     with pytest.raises(ValueError):
         APIClient("https://api.example.com", retry_methods=frozenset())
+
+
+@rsps_lib.activate
+def test_gemini_key_is_header_not_url_or_error():
+    import requests
+    from gemini_client.client import GeminiClient
+    url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
+    rsps_lib.add('POST', url, status=404)
+    with GeminiClient(api_key='private-test-key') as client:
+        with pytest.raises(requests.HTTPError) as error:
+            client.generate('test')
+    assert 'private-test-key' not in str(error.value)
+    assert 'private-test-key' not in rsps_lib.calls[0].request.url
+    assert rsps_lib.calls[0].request.headers['x-goog-api-key'] == 'private-test-key'
+    assert len(rsps_lib.calls) == 1
+
+
+@rsps_lib.activate
+@pytest.mark.parametrize('status', [301, 302, 307, 308])
+def test_redirects_cannot_forward_provider_credentials(status):
+    import requests
+    rsps_lib.add('GET', 'https://api.example.com/start', status=status,
+                 headers={'Location': 'https://attacker.invalid/collect'})
+    with APIClient('https://api.example.com') as client:
+        client.session.headers['x-goog-api-key'] = 'private-test-key'
+        with pytest.raises(requests.HTTPError, match='redirect refused'):
+            client.get('/start')
+    assert len(rsps_lib.calls) == 1

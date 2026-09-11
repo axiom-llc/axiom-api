@@ -142,3 +142,15 @@ class StripeClient(APIClient):
 ## License
 
 MIT — [AXIOM LLC](https://axiom-llc.github.io)
+
+## Provider boundary validation
+
+Send Gemini credentials in `x-goog-api-key`, never URL query parameters. Refuse
+redirects so provider-specific headers cannot reach another origin. POST
+generation requests are not implicitly retried.
+
+Manual validation on 2026-09-11 exercised `GeminiClient.generate` against
+`gemini-2.5-flash`, then an intentionally nonexistent model. Generation succeeded;
+the provider returned HTTP 404 for the invalid model, without the key appearing
+in the exception text. Offline tests cover redirect refusal and retry behavior.
+Keep real provider credentials out of CI.
