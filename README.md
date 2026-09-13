@@ -1,37 +1,34 @@
-# axiom-api
+# AXIOM API
 
-Production-grade HTTP client base for REST API integrations — automatic retries for idempotent methods,
-exponential backoff, and rate limiting without rewriting the same error-handling
-logic for every new integration.
+Reusable Python HTTP client foundation for REST integrations. It centralizes
+bounded retry policy, interval throttling, authentication headers, and session
+lifecycle management without prescribing an application architecture.
 
 ![CI](https://github.com/axiom-llc/axiom-api/actions/workflows/ci.yml/badge.svg)
 
-Built for automation pipelines where reliability is non-negotiable: transient
-failures retry silently, rate limits are respected, sessions are always cleaned
-up, and errors surface as typed exceptions rather than silent data corruption.
+## Current scope
 
----
+Version `0.1.1` provides an `APIClient` and a Gemini example client. The
+repository validates Python 3.11 and 3.12 in CI; its tests mock outbound HTTP.
 
-## Features
+`APIClient` provides:
 
-- **Exponential backoff** — automatic retry on 429 / 5xx and connectivity
-  errors, up to 5 attempts with jittered delay
-- **Rate limiting** — configurable requests-per-second throttling via interval
-  throttle; safe for burst workloads
-- **Context manager** — guaranteed session cleanup; no leaked connections under
-  error conditions
-- **Extensible** — subclass `APIClient` to add Bearer tokens, OAuth, HMAC
-  signatures, or any custom auth scheme
-- **Minimal** — one runtime dependency (`requests`); no frameworks, no magic
+- retry handling for 429, selected 5xx responses, and connection failures;
+- a configurable minimum interval between calls;
+- a `requests.Session` context-manager lifecycle;
+- Bearer-token headers that subclasses may replace; and
+- redirect refusal before a provider credential header can be forwarded.
 
----
+Retries are a transport behavior, not an end-to-end delivery guarantee. Rate
+limiting is process-local and does not coordinate concurrent clients or replace
+a provider's quota controls.
 
-## Installation
+## Install
 
 ```bash
 git clone https://github.com/axiom-llc/axiom-api
 cd axiom-api
-pip install -e .
+python -m pip install -e .
 ```
 
 ---
@@ -69,7 +66,7 @@ with APIClient("https://api.example.com", retry_methods=frozenset({"GET", "POST"
     client.post("/orders", json={"quantity": 1})
 ```
 
-## Auth Patterns
+## Authentication patterns
 
 The base client sends `api_key` as a Bearer token header. Override in a
 subclass to use any other scheme:
@@ -83,10 +80,11 @@ class HMACClient(APIClient):
 
 ---
 
-## Included Examples
+## Included example
 
-**`gemini_client/`** — production Gemini API client with structured JSON output,
-built on `APIClient`.
+`gemini_client/` is a Gemini API example built on `APIClient`. It sends the key
+in `x-goog-api-key`, refuses redirects, and leaves POST generation requests out
+of the default retry set.
 
 ```bash
 export GEMINI_API_KEY=your-key
@@ -95,28 +93,15 @@ python -m gemini_client.client "explain the CAP theorem in 3 bullet points"
 
 ---
 
-## Tests
+## Validation
 
 ```bash
-pip install -e ".[dev]"
-pytest tests/ -q
+python -m pip install -e ".[dev]"
+python -m pytest tests/ -q
 ```
 
-All tests mock outbound HTTP — no network access or API keys required.
-CI runs on Python 3.11 and 3.12 on every push.
-
----
-
-## vs. raw requests
-
-|                            | Raw `requests`  | `APIClient`          |
-|----------------------------|-----------------|----------------------|
-| Transient error handling   | Crashes         | Auto-retries         |
-| Rate limiting              | Manual / none   | Built-in             |
-| Session cleanup            | Manual          | Context manager      |
-| Retry logic                | Per-integration | Once, inherited      |
-| Auth scheme                | Per-integration | Override one method  |
-| Lines to integrate new API | ~40+            | ~10                  |
+All tests mock outbound HTTP; no API key is required. CI runs on Python 3.11
+and 3.12 for pushes.
 
 ---
 
@@ -139,10 +124,6 @@ class StripeClient(APIClient):
 
 ---
 
-## License
-
-MIT — [AXIOM LLC](https://axiom-llc.github.io)
-
 ## Provider boundary validation
 
 Send Gemini credentials in `x-goog-api-key`, never URL query parameters. Refuse
@@ -154,3 +135,13 @@ Manual validation on 2026-09-11 exercised `GeminiClient.generate` against
 the provider returned HTTP 404 for the invalid model, without the key appearing
 in the exception text. Offline tests cover redirect refusal and retry behavior.
 Keep real provider credentials out of CI.
+
+## Related AXIOM components
+
+- [APEX](https://github.com/axiom-llc/axiom-apex) — execution runtime.
+- [ASON](https://github.com/axiom-llc/axiom-ason) — pre-execution policy enforcement.
+- [RAG](https://github.com/axiom-llc/axiom-rag) — retrieval/storage HTTP service and library.
+
+## License
+
+[MIT](LICENSE) — [AXIOM LLC](https://axiom-llc.github.io)
