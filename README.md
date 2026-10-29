@@ -1,4 +1,6 @@
-# AXIOM API
+# AXIOM API — Integration Client
+
+Canonical package development and integrated validation now live in [AXIOM APEX](https://github.com/axiom-llc/axiom-apex/tree/main/packages/api). This repository preserves the original package history and existing consumer URLs.
 
 Reusable Python HTTP client foundation for REST integrations. It centralizes
 bounded retry policy, interval throttling, authentication headers, and session
